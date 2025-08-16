@@ -1,0 +1,116 @@
+spring:
+  application:
+    name: oms
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:development}
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:oms}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  web:
+    resources:
+      add-mappings: false
+
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+app:
+  api:
+    version: v1
+    endpoints:
+      auth: /auth
+      products: /products
+      customers: /customers
+      orders: /orders
+      invoices: /invoices
+      
+  security:
+    jwt:
+      secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890}
+      expiration: 3600000
+      issuer: oms-api
+
+  pagination:
+    default-page-size: 20
+    max-page-size: 100
+    default-sort-direction: DESC
+    allowed-sort-properties:
+      - id
+      - createdAt
+      - updatedAt
+      - productName
+      - category
+      - price
+      - stockQuantity
+      - firstName
+      - lastName
+      - email
+      - orderDate
+      - totalAmount
+      - orderStatus
+
+logging:
+  level:
+    com.ejada.oms: INFO
+    org.hibernate.SQL: WARN
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+---
+spring:
+  config:
+    activate:
+      on-profile: development
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.ejada.oms: DEBUG
+
+---
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    com.ejada.oms: WARN
